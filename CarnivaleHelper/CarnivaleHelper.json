@@ -1,0 +1,13 @@
+{
+  "Author": "keoShine",
+  "Name": "Masked Carnivale Helper",
+  "Punchline": "Overlay for Weekly Targets in Masked Carnivale",
+  "Description": "Display overlay windows showing targets of current duty and information of current progress.",
+  "InternalName": "CarnivaleHelper",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "sample",
+    "plugin",
+    "goats"
+  ]
+}

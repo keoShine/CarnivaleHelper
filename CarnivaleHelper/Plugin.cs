@@ -1,22 +1,26 @@
-﻿using Dalamud.Game.Command;
+using System;
+using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
 using System.Reflection;
 using Dalamud.Interface.Windowing;
-using SamplePlugin.Windows;
+using CarnivaleHelper.Windows;
+using CarnivaleHelper.Modules;
+using Dalamud.Logging;
 
-namespace SamplePlugin
+namespace CarnivaleHelper
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Sample Plugin";
-        private const string CommandName = "/pmycommand";
+        public string Name => "Carnivale Helper";
+        private const string CommandName = "/pcarnivale";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
-        public WindowSystem WindowSystem = new("SamplePlugin");
+        public WindowSystem WindowSystem = new("CarnivaleHelper");
+
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -27,17 +31,25 @@ namespace SamplePlugin
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
+            try
+            {
+                this.PluginInterface.Create<Service>();
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Debug(ex, "Something went wrong with PluginInterface Create");
+            }
 
             // you might normally want to embed resources and load them from the manifest stream
             var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+            var target = new Targets();
 
             WindowSystem.AddWindow(new ConfigWindow(this));
-            WindowSystem.AddWindow(new MainWindow(this, goatImage));
+            WindowSystem.AddWindow(new MainWindow(this, target));
 
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "Open the config menu"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
@@ -53,7 +65,7 @@ namespace SamplePlugin
         private void OnCommand(string command, string args)
         {
             // in response to the slash command, just display our main ui
-            WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
+            WindowSystem.GetWindow("Carnivale Overlay")!.IsOpen = !WindowSystem.GetWindow("Carnivale Overlay")!.IsOpen;
         }
 
         private void DrawUI()
@@ -63,7 +75,7 @@ namespace SamplePlugin
 
         public void DrawConfigUI()
         {
-            WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
+            WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen = !WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen;
         }
     }
 }
