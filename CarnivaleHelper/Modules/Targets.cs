@@ -3,66 +3,72 @@ using System.Threading.Tasks;
 using CarnivaleHelper.Utilities;
 using Dalamud.Game.Gui;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using Dalamud.Hooking;
 using Dalamud.Logging;
 using System.Diagnostics;
+using Lumina.Excel.GeneratedSheets;
 
 namespace CarnivaleHelper.Modules
 {
-    public unsafe class Targets
+    public unsafe class Targets :IDisposable
     {
-        //Get Target Conditions on currently selected duty
-        public unsafe void GetTargets()
+        public uint currentDuty = 0;
+        public byte target_0 = 0;
+        public string? target_0_Name = "";
+        public byte target_1 = 0;
+        public string? target_1_Name = "";
+        public ushort? standardFinishTime = 0;
+        public ushort? idealFinishTime = 0;
+        private AgentAozContentBriefing* _agent = Framework.Instance()->UIModule->GetAgentModule()->GetAgentAozContentBriefing();
+
+        public Targets(uint duty)
         {
-            try
-            {
-                var resNode = new BaseNode("AOZContentBriefing");
+            currentDuty = duty;
+            target_0 = GetWeeklyTarget()[0];
+            target_0_Name = GetWeeklyTargetName(target_0);
+            target_1 = GetWeeklyTarget()[1];
+            target_1_Name = GetWeeklyTargetName(target_1);
+            standardFinishTime = GetStandardFinishTime();
+            idealFinishTime = GetIdealFinishTime();
+        }
 
-                if (resNode != null)
-                {
-                    var targetImageNode = resNode.GetNode<AtkImageNode>(25);
-                    var targetDifficulty = resNode.GetNode<AtkTextNode>(7);
-                    var firstTargetCondition = resNode.GetNode<AtkTextNode>(15);
-                    var secondTargetCondition = resNode.GetNode<AtkTextNode>(16);
+        public void Dispose() { }
 
-                    if (targetImageNode->AtkResNode.IsVisible && targetDifficulty->NodeText.ToString() != "Novice")
-                    {
-                        if (targetDifficulty->NodeText.ToString() == "Moderate" || targetDifficulty->NodeText.ToString() == "Advanced")
-                        {
-                            if (firstTargetCondition != null)
-                            {
-                                PluginLog.Debug(firstTargetCondition->NodeText.ToString());
-                            }
-                            else
-                            {
-                                PluginLog.Debug("Failed on First Text Condition");
-                            }
-                        }
-                        if (targetDifficulty->NodeText.ToString() == "Advanced")
-                        {
-                            if (secondTargetCondition != null)
-                            {
-                                PluginLog.Debug(secondTargetCondition->NodeText.ToString());
-                            }
-                            else
-                            {
-                                PluginLog.Debug("Failed on Second Text Condition");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        PluginLog.Debug("No Targets on selected Duty");
-                    }
-                }
-                else
-                {
-                    PluginLog.Debug("Failed on AOZContentBriefing Addon");
-                }
-            }
-            catch (Exception ex)
+        public uint GetCurrentDuty()
+        {
+            return currentDuty;
+        }
+
+
+        public byte[] GetWeeklyTarget()
+        {
+            var currentTarget = new byte[2];
+            if (currentDuty == Convert.ToUInt16(_agent->WeeklyAozContentId[1]))
             {
-                PluginLog.Debug(ex, "Something broke..");
+                currentTarget[0] = _agent->ModerateRequirement[0];
             }
+            else if (currentDuty == Convert.ToUInt16(_agent->WeeklyAozContentId[2]))
+            {
+                currentTarget[0] = _agent->AdvancedRequirement[0];
+                currentTarget[1] = _agent->AdvancedRequirement[1];
+            }
+            return currentTarget;
+        }
+
+        public ushort? GetStandardFinishTime()
+        {
+            return Service.DataManager.GetExcelSheet<AOZContent>()!.GetRow(currentDuty)?.StandardFinishTime;
+        }
+
+        public ushort? GetIdealFinishTime()
+        {
+            return Service.DataManager.GetExcelSheet<AOZContent>()!.GetRow(currentDuty)?.IdealFinishTime;
+        }
+        public string? GetWeeklyTargetName(byte targetId)
+        {
+            return Service.DataManager.GetExcelSheet<AOZScore>()!.GetRow(targetId)?.Name.ToString();
         }
     }
 }

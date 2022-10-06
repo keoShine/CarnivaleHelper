@@ -8,6 +8,7 @@ using Dalamud.Interface.Windowing;
 using CarnivaleHelper.Windows;
 using CarnivaleHelper.Modules;
 using Dalamud.Logging;
+using FFXIVClientStructs;
 
 namespace CarnivaleHelper
 {
@@ -26,26 +27,22 @@ namespace CarnivaleHelper
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager)
         {
+            Resolver.Initialize();
+
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
-            try
-            {
-                this.PluginInterface.Create<Service>();
-            }
-            catch (Exception ex)
-            {
-                PluginLog.Debug(ex, "Something went wrong with PluginInterface Create");
-            }
+            this.PluginInterface.Create<Service>();
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var target = new Targets();
+            //var target = new Targets();
+            var spellbook = new Spellbook();
 
             WindowSystem.AddWindow(new ConfigWindow(this));
-            WindowSystem.AddWindow(new MainWindow(this, target));
+            WindowSystem.AddWindow(new MainWindow(this));
+            WindowSystem.AddWindow(new TargetConditionOverlay(this));
 
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
@@ -54,6 +51,7 @@ namespace CarnivaleHelper
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+
         }
 
         public void Dispose()
@@ -76,6 +74,11 @@ namespace CarnivaleHelper
         public void DrawConfigUI()
         {
             WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen = !WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen;
+        }
+
+        public void DrawDutyOverlay()
+        {
+            WindowSystem.GetWindow("Target Condition Overlay")!.IsOpen = !WindowSystem.GetWindow("Target Condition Overlay")!.IsOpen;
         }
     }
 }
