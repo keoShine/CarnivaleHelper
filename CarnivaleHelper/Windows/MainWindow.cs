@@ -12,10 +12,10 @@ namespace CarnivaleHelper.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private Plugin Plugin;
-    private Targets Targets;
+    private readonly Plugin Plugin;
+    private readonly Targets? Targets;
 
-    public MainWindow(Plugin plugin, Targets target) : base(
+    public MainWindow(Plugin plugin) : base(
         "Carnivale Overlay", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
@@ -25,7 +25,6 @@ public class MainWindow : Window, IDisposable
         };
 
         this.Plugin = plugin;
-        this.Targets = target;
     }
 
     public void Dispose() { }
@@ -40,15 +39,44 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        if (ImGui.Button("Test"))
+        if (ImGui.Button("Get Weekly Targets"))
         {
             try
             {
-                this.Targets.GetTargets();
+                //this.Targets = new Targets();
+                //var targetDuty = this.Targets.GetWeeklyTarget(this.Targets.GetCurrentDuty());
+                //for (int i = 0; i < targetDuty.Length; i++)
+                //{
+                //    if (targetDuty[i] != 0)
+                //        PluginLog.Debug(targetDuty[i].ToString());
+                //}
+                //if (this.Targets.target0 != 0)
+                //{
+                //    PluginLog.Debug(this.Targets.target0.ToString());
+                //}
+                //if (this.Targets.target1 != 0)
+                //{
+                //    PluginLog.Debug(this.Targets.target1.ToString());
+                //}
+                //this.Targets.Dispose();
             }
             catch (Exception ex)
             {
                 PluginLog.Debug(ex, "Something went very wrong");
+            }
+        }
+
+        ImGui.Spacing();
+
+        if (ImGui.Button("Display Target Overlay"))
+        {
+            try
+            {
+                this.Plugin.DrawDutyOverlay();
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Debug(ex, "Could not display Target Overlay");
             }
         }
     }
