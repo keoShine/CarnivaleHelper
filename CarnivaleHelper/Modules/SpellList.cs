@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using Dalamud.Hooking;
 using Lumina.Excel.GeneratedSheets;
 using System.Linq;
+using CarnivaleHelper.Utilities;
+using System.Numerics;
 
 namespace CarnivaleHelper.Modules
 {
@@ -16,6 +18,7 @@ namespace CarnivaleHelper.Modules
         public List<byte> Ranks;
         public List<byte> ElementalAspect;
         public List<byte> DamageType;
+        public Vector4 sprintCheck = Colors.Green;
 
         public SpellList()
         {
@@ -50,27 +53,27 @@ namespace CarnivaleHelper.Modules
             {
                 uint actionId = (uint)Marshal.ReadInt32(effectHeader, 0x8);
                 byte rank = 0;
+                byte element = 0;
+                byte attackType = 0;
+
+                //Only add spells to the SpellList if they're Blue Mage spells -- Role and General actions are not counted
                 if (Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(actionId)!.ClassJob.Row == 36)
                 {
                     rank = Service.DataManager.GetExcelSheet<AozAction>()!.Where(row => row.Action.Row == actionId).FirstOrDefault()!.Rank;
+                    element = Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(actionId)!.Aspect;
+                    attackType = (byte)Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(actionId)!.AttackType.Row;
+
+                    if (!Spells.Contains(actionId))
+                        Spells.Add(actionId);
+                    if (!Ranks.Contains(rank) && rank != 0)
+                        Ranks.Add(rank);
+                    if (!ElementalAspect.Contains(element) && element != 0 && element != 7)
+                        ElementalAspect.Add(element);
+                    if (!DamageType.Contains(attackType) && attackType != 0)
+                        DamageType.Add(attackType);
                 }
-                byte element = Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(actionId)!.Aspect;
-                byte attackType = (byte) Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(actionId)!.AttackType.Row;
-
-
-                if (!Spells.Contains(actionId))
-                    Spells.Add(actionId);
-                if (!Ranks.Contains(rank) && rank != 0)
-                    Ranks.Add(rank);
-                if (!ElementalAspect.Contains(element) && element != 0 && element != 7)
-                    ElementalAspect.Add(element);
-                if (!DamageType.Contains(attackType) && attackType != 0)
-                    DamageType.Add(attackType);
-
-                PluginLog.Debug("Action ID: " + actionId.ToString());
-                PluginLog.Debug("Action Rank: " + rank.ToString());
-                PluginLog.Debug("Action Aspect: " + element.ToString());
-                PluginLog.Debug("Action Attack Type: " + attackType.ToString());
+                if (actionId == 3)
+                    sprintCheck = Colors.Red;
             }
             catch (Exception ex)
             {

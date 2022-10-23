@@ -14,10 +14,10 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.Size = new Vector2(232, 150);
-        this.SizeCondition = ImGuiCond.Always;
+        Size = new Vector2(232, 150);
+        SizeCondition = ImGuiCond.Always;
 
-        this.Configuration = plugin.Configuration;
+        Configuration = plugin.Configuration;
     }
 
     public void Dispose() { }
@@ -25,33 +25,33 @@ public class ConfigWindow : Window, IDisposable
     public override void Draw()
     {
         
-        var configValueTarget = this.Configuration.TargetTracker;
+        var configValueTarget = Configuration.TargetTracker;
         if (ImGui.Checkbox("Display Target Conditions", ref configValueTarget))
         {
-            this.Configuration.TargetTracker = configValueTarget;
-            this.Configuration.Save();
+            Configuration.TargetTracker = configValueTarget;
+            Configuration.Save();
         }
 
-        var configValueTimer = this.Configuration.Timer;
+        var configValueTimer = Configuration.Timer;
         if (ImGui.Checkbox("Display Timer", ref configValueTimer))
         {
-            this.Configuration.Timer = configValueTimer;
-            this.Configuration.Save();
+            Configuration.Timer = configValueTimer;
+            Configuration.Save();
         }
 
         //Config settings not implemented yet -- the two below checkboxes do nothing
-        var configValueUniqueSpells = this.Configuration.UniqueSpellCounter;
+        var configValueUniqueSpells = Configuration.UniqueSpellCounter;
         if (ImGui.Checkbox("Display Unique Spell Count", ref configValueUniqueSpells))
         {
-            this.Configuration.UniqueSpellCounter = configValueUniqueSpells;
-            this.Configuration.Save();
+            Configuration.UniqueSpellCounter = configValueUniqueSpells;
+            Configuration.Save();
         }
 
-        var configValueSpellList = this.Configuration.SpellList;
+        var configValueSpellList = Configuration.SpellList;
         if (ImGui.Checkbox("Display Spells Used", ref configValueSpellList))
         {
-            this.Configuration.SpellList = configValueSpellList;
-            this.Configuration.Save();
+            Configuration.SpellList = configValueSpellList;
+            Configuration.Save();
         }
     }
 }

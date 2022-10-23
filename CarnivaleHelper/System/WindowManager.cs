@@ -17,10 +17,10 @@ namespace CarnivaleHelper.System
 
         public WindowManager(Plugin plugin)
         {
-            this.Plugin = plugin;
-            this.configWindow = new ConfigWindow(plugin);
-            this.mainWindow = new MainWindow(plugin);
-            this.targetConditionOverlay = new TargetConditionOverlay(plugin);
+            Plugin = plugin;
+            configWindow = new ConfigWindow(plugin);
+            mainWindow = new MainWindow(plugin);
+            targetConditionOverlay = new TargetConditionOverlay(plugin);
             WindowSystem.AddWindow(configWindow);
             WindowSystem.AddWindow(mainWindow);
             WindowSystem.AddWindow(targetConditionOverlay);
@@ -30,9 +30,9 @@ namespace CarnivaleHelper.System
 
         public void Dispose()
         {
-            this.configWindow.Dispose();
-            this.mainWindow.Dispose();
-            this.targetConditionOverlay.Dispose();
+            configWindow.Dispose();
+            mainWindow.Dispose();
+            targetConditionOverlay.Dispose();
             Service.PluginInterface.UiBuilder.Draw -= DrawUI;
             Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
 

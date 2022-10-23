@@ -4,7 +4,7 @@ namespace CarnivaleHelper.Enums
     //AOZ Duties are non-contiguous in ContentFinderCondition sheet and can't be referenced by a constant row offset
     public enum AOZContentID
         {
-            aoz001,
+            aoz001 = 1,
             aoz002,
             aoz003,
             aoz004,

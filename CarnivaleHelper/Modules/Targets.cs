@@ -1,13 +1,6 @@
 using System;
-using System.Threading.Tasks;
-using CarnivaleHelper.Utilities;
-using Dalamud.Game.Gui;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Dalamud.Hooking;
-using Dalamud.Logging;
-using System.Diagnostics;
 using Lumina.Excel.GeneratedSheets;
 
 namespace CarnivaleHelper.Modules
@@ -76,7 +69,7 @@ namespace CarnivaleHelper.Modules
             {
                 //Add Finish Time to Target Name if Target is 'Too Fast, Too Furious' or 'Slow and Steady'
                 case 1: case 2:
-                    return Service.DataManager.GetExcelSheet<AOZScore>()!.GetRow(targetId)?.Name.ToString() + " (" + (this.finishTime / 60).ToString() + ":" + (this.finishTime % 60).ToString() + ")";
+                    return Service.DataManager.GetExcelSheet<AOZScore>()!.GetRow(targetId)?.Name.ToString() + " (" + (finishTime / 60).ToString() + ":" + (finishTime % 60).ToString() + ")";
 
                 default:
                     return Service.DataManager.GetExcelSheet<AOZScore>()!.GetRow(targetId)?.Name.ToString();

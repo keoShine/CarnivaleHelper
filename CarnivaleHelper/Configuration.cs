@@ -21,12 +21,12 @@ namespace CarnivaleHelper
 
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
-            this.PluginInterface = pluginInterface;
+            PluginInterface = pluginInterface;
         }
 
         public void Save()
         {
-            this.PluginInterface!.SavePluginConfig(this);
+            PluginInterface!.SavePluginConfig(this);
         }
     }
 }

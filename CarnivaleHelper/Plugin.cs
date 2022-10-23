@@ -29,16 +29,16 @@ namespace CarnivaleHelper
         {
             Resolver.Initialize();
 
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
+            PluginInterface = pluginInterface;
+            CommandManager = commandManager;
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface);
-            this.PluginInterface.Create<Service>();
+            Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Configuration.Initialize(PluginInterface);
+            PluginInterface.Create<Service>();
             Service.WindowManager = new System.WindowManager(this);
 
             // you might normally want to embed resources and load them from the manifest stream
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Open the config menu"
             });
@@ -48,8 +48,8 @@ namespace CarnivaleHelper
         public void Dispose()
         {
             Service.WindowManager.Dispose();
-            this.WindowSystem.RemoveAllWindows();
-            this.CommandManager.RemoveHandler(CommandName);
+            WindowSystem.RemoveAllWindows();
+            CommandManager.RemoveHandler(CommandName);
         }
 
         private void OnCommand(string command, string args)
