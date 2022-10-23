@@ -25,5 +25,8 @@ namespace CarnivaleHelper
         [PluginService] public static ToastGui Toast { get; private set; } = null!;
         [PluginService] public static GameGui GameGui { get; private set; } = null!;
         [PluginService] public static TargetManager TargetManager { get; private set; } = null!;
+        [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
+
+        public static System.WindowManager WindowManager = null!;
     }
 }

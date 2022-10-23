@@ -14,7 +14,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.Size = new Vector2(232, 130);
+        this.Size = new Vector2(232, 150);
         this.SizeCondition = ImGuiCond.Always;
 
         this.Configuration = plugin.Configuration;
@@ -24,26 +24,33 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        // can't ref a property, so use a local copy
+        
         var configValueTarget = this.Configuration.TargetTracker;
         if (ImGui.Checkbox("Display Target Conditions", ref configValueTarget))
         {
             this.Configuration.TargetTracker = configValueTarget;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
             this.Configuration.Save();
         }
+
+        var configValueTimer = this.Configuration.Timer;
+        if (ImGui.Checkbox("Display Timer", ref configValueTimer))
+        {
+            this.Configuration.Timer = configValueTimer;
+            this.Configuration.Save();
+        }
+
+        //Config settings not implemented yet -- the two below checkboxes do nothing
         var configValueUniqueSpells = this.Configuration.UniqueSpellCounter;
         if (ImGui.Checkbox("Display Unique Spell Count", ref configValueUniqueSpells))
         {
             this.Configuration.UniqueSpellCounter = configValueUniqueSpells;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
             this.Configuration.Save();
         }
+
         var configValueSpellList = this.Configuration.SpellList;
         if (ImGui.Checkbox("Display Spells Used", ref configValueSpellList))
         {
             this.Configuration.SpellList = configValueSpellList;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
             this.Configuration.Save();
         }
     }

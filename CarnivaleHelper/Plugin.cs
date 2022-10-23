@@ -35,27 +35,19 @@ namespace CarnivaleHelper
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
             this.PluginInterface.Create<Service>();
+            Service.WindowManager = new System.WindowManager(this);
 
             // you might normally want to embed resources and load them from the manifest stream
-            //var target = new Targets();
-            var spellbook = new Spellbook();
-
-            WindowSystem.AddWindow(new ConfigWindow(this));
-            WindowSystem.AddWindow(new MainWindow(this));
-            WindowSystem.AddWindow(new TargetConditionOverlay(this));
-
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Open the config menu"
             });
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-
         }
 
         public void Dispose()
         {
+            Service.WindowManager.Dispose();
             this.WindowSystem.RemoveAllWindows();
             this.CommandManager.RemoveHandler(CommandName);
         }
@@ -63,22 +55,17 @@ namespace CarnivaleHelper
         private void OnCommand(string command, string args)
         {
             // in response to the slash command, just display our main ui
-            WindowSystem.GetWindow("Carnivale Overlay")!.IsOpen = !WindowSystem.GetWindow("Carnivale Overlay")!.IsOpen;
-        }
-
-        private void DrawUI()
-        {
-            this.WindowSystem.Draw();
+            Service.WindowManager.DrawMainWindow();
         }
 
         public void DrawConfigUI()
         {
-            WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen = !WindowSystem.GetWindow("Carnivale Helper Config")!.IsOpen;
+            Service.WindowManager.DrawConfigUI();
         }
 
         public void DrawDutyOverlay()
         {
-            WindowSystem.GetWindow("Target Condition Overlay")!.IsOpen = !WindowSystem.GetWindow("Target Condition Overlay")!.IsOpen;
+            Service.WindowManager.DrawDutyOverlay();
         }
     }
 }

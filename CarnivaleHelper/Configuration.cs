@@ -10,6 +10,7 @@ namespace CarnivaleHelper
         public int Version { get; set; } = 0;
 
         public bool TargetTracker { get; set; } = true;
+        public bool Timer { get; set; } = true;
         public bool UniqueSpellCounter { get; set; } = false;
         public bool SpellList { get; set; } = false;
         
