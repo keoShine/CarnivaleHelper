@@ -13,7 +13,10 @@ namespace CarnivaleHelper
         public bool Timer { get; set; } = true;
         public bool UniqueSpellCounter { get; set; } = false;
         public bool SpellList { get; set; } = false;
-        
+
+#if DEBUG
+        public bool DebugButtons { get; set; } = false;
+#endif
 
         // the below exist just to make saving less cumbersome
         [NonSerialized]

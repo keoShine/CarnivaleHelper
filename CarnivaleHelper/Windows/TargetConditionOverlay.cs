@@ -29,12 +29,17 @@ namespace CarnivaleHelper.Windows
 
         public TargetConditionOverlay(Plugin plugin) : base(
             "Target Condition Overlay",
-            ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
+            ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
             ImGuiWindowFlags.NoScrollWithMouse)
         {
             SignatureHelper.Initialise(this);
-            Size = new Vector2(232, 130);
-            SizeCondition = ImGuiCond.Once;
+            //Size = new Vector2(175, 75);
+            //SizeCondition = ImGuiCond.Once;
+            SizeConstraints = new WindowSizeConstraints
+            {
+                MinimumSize = new Vector2(175, 75),
+                MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
+            };
             Plugin = plugin;
             Configuration = plugin.Configuration;
 
@@ -49,7 +54,10 @@ namespace CarnivaleHelper.Windows
             if (Targets != null)
                 Targets.Dispose();
             if (TargetColorManager != null)
+            {
                 TargetColorManager.Dispose();
+                TargetColorManager = null;
+            }     
         }
 
         private void OnContentFinderPop(object? sender, ContentFinderCondition queuedDuty)
@@ -73,7 +81,10 @@ namespace CarnivaleHelper.Windows
                 if (Targets != null)
                     Targets.Dispose();
                 if (TargetColorManager != null)
+                {
                     TargetColorManager!.Dispose();
+                    TargetColorManager = null;
+                }
             }
             //Territory 796 = Blue Sky (AOZ Arena)
             if (territory == 796)
@@ -85,40 +96,44 @@ namespace CarnivaleHelper.Windows
         public override void Draw()
         {
 #if DEBUG
-            if (ImGui.Button("Clear Spell List"))
+            if (Configuration.DebugButtons == true)
             {
-                TargetColorManager!.SpellList.ClearSpellList();
-            }
+                if (ImGui.Button("Clear Spell List"))
+                {
+                    TargetColorManager!.SpellList.ClearSpellList();
+                }
 
-            if (ImGui.Button("Print Spell List"))
-            {
-                TargetColorManager!.SpellList.PrintSpellList();
-            }
-            
-            //Button for quick testing debug stuff
-            if (ImGui.Button("Debug Testing Button") && TargetColorManager != null)
-            {
-                PluginLog.Debug("Spell List: ");
-                foreach (uint spells in TargetColorManager!.SpellList.Spells)
+                if (ImGui.Button("Print Spell List"))
                 {
-                    PluginLog.Debug(spells.ToString());
+                    TargetColorManager!.SpellList.PrintSpellList();
                 }
-                PluginLog.Debug("Unique Spell Count: " + TargetColorManager!.SpellList.Spells.Count().ToString());
-                PluginLog.Debug("Spell Ranks: ");
-                foreach (byte rank in TargetColorManager!.SpellList.Ranks)
+
+                //Button for quick testing debug stuff
+                if (ImGui.Button("Debug Testing Button") && TargetColorManager != null)
                 {
-                    PluginLog.Debug(rank.ToString());
+                    PluginLog.Debug("Spell List: ");
+                    foreach (uint spells in TargetColorManager!.SpellList.Spells)
+                    {
+                        PluginLog.Debug(spells.ToString());
+                    }
+                    PluginLog.Debug("Unique Spell Count: " + TargetColorManager!.SpellList.Spells.Count().ToString());
+                    PluginLog.Debug("Spell Ranks: ");
+                    foreach (byte rank in TargetColorManager!.SpellList.Ranks)
+                    {
+                        PluginLog.Debug(rank.ToString());
+                    }
+                    PluginLog.Debug("Spell Aspects: ");
+                    foreach (byte element in TargetColorManager!.SpellList.ElementalAspect)
+                    {
+                        PluginLog.Debug(element.ToString());
+                    }
+                    PluginLog.Debug("Spell Damage Types: ");
+                    foreach (byte physical in TargetColorManager!.SpellList.DamageType)
+                    {
+                        PluginLog.Debug(physical.ToString());
+                    }
                 }
-                PluginLog.Debug("Spell Aspects: ");
-                foreach (byte element in TargetColorManager!.SpellList.ElementalAspect)
-                {
-                    PluginLog.Debug(element.ToString());
-                }
-                PluginLog.Debug("Spell Damage Types: ");
-                foreach (byte physical in TargetColorManager!.SpellList.DamageType)
-                {
-                    PluginLog.Debug(physical.ToString());
-                }
+                ImGui.Separator();
             }
 #endif
             if (Targets != null)
@@ -127,10 +142,13 @@ namespace CarnivaleHelper.Windows
                 {
                     foreach (byte target in Targets.targetList)
                     {
-                        if (TargetColorManager != null)
-                            ImGui.TextColored(TargetColorManager.SetColor(target), Targets.GetWeeklyTargetName(target));
-                        else
-                            ImGui.TextColored(Colors.White, Targets.GetWeeklyTargetName(target));
+                        if (target != 0)
+                        {
+                            if (TargetColorManager != null)
+                                ImGui.TextColored(TargetColorManager.SetColor(target), Targets.GetWeeklyTargetName(target));
+                            else
+                                ImGui.TextColored(Colors.White, Targets.GetWeeklyTargetName(target));
+                        }
                     }
 
                     //Territory 796 = Blue Sky (AOZ Arena)
@@ -146,6 +164,36 @@ namespace CarnivaleHelper.Windows
                 catch (Exception ex)
                 {
                     PluginLog.Error(ex, "Could not set Targets");
+                }
+
+                if (TargetColorManager != null && Configuration.UniqueSpellCounter == true)
+                {
+                    try
+                    {
+                        ImGui.Separator();
+                        ImGui.TextColored(Colors.White, "Unique Spells: " + TargetColorManager!.SpellList.Spells.Count.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Debug(ex, "Could not draw Unique Spell Counter");
+                    }
+
+                }
+                if (TargetColorManager != null & Configuration.SpellList == true && TargetColorManager.SpellList.Spells.Count != 0)
+                {
+                    try
+                    {
+                        ImGui.Separator();
+                        ImGui.TextColored(Colors.White, "Spell List: ");
+                        foreach (uint spell in TargetColorManager!.SpellList.Spells)
+                        {
+                            ImGui.TextColored(Colors.White, Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()!.GetRow(spell)!.Name.ToString());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Debug(ex, "Could not draw Spell List");
+                    }
                 }
             }
         }

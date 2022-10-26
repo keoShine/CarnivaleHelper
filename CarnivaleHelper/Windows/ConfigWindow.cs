@@ -11,11 +11,9 @@ public class ConfigWindow : Window, IDisposable
 
     public ConfigWindow(Plugin plugin) : base(
         "Carnivale Helper Config",
-        ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
+        ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(232, 150);
-        SizeCondition = ImGuiCond.Always;
 
         Configuration = plugin.Configuration;
     }
@@ -53,5 +51,13 @@ public class ConfigWindow : Window, IDisposable
             Configuration.SpellList = configValueSpellList;
             Configuration.Save();
         }
+#if DEBUG
+        var configValueDebugButtons = Configuration.DebugButtons;
+        if (ImGui.Checkbox("Debug Buttons", ref configValueDebugButtons))
+        {
+            Configuration.DebugButtons = configValueDebugButtons;
+            Configuration.Save();
+        }
+#endif
     }
 }
