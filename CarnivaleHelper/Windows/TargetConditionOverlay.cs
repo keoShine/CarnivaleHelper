@@ -66,8 +66,10 @@ namespace CarnivaleHelper.Windows
             {
                 var dutyId = (uint)Enum.Parse<AOZContentID>(queuedDuty.ShortCode.ToString());
                 Targets = new Targets(dutyId);
-
-                Service.WindowManager.targetConditionOverlay.IsOpen = true;
+                
+                if (Targets.targetList.Any(x => x != 0))
+                    Service.WindowManager.targetConditionOverlay.IsOpen = true;
+                
                 PluginLog.Debug("Duty Popped: " + dutyId.ToString());
             }
         }
@@ -98,18 +100,18 @@ namespace CarnivaleHelper.Windows
 #if DEBUG
             if (Configuration.DebugButtons == true)
             {
-                if (ImGui.Button("Clear Spell List"))
+                if (ImGui.Button("Clear Spell List") && TargetColorManager != null)
                 {
                     TargetColorManager!.SpellList.ClearSpellList();
                 }
 
-                if (ImGui.Button("Print Spell List"))
+                if (ImGui.Button("Print Spell List") && TargetColorManager != null)
                 {
                     TargetColorManager!.SpellList.PrintSpellList();
                 }
 
                 //Button for quick testing debug stuff
-                if (ImGui.Button("Debug Testing Button") && TargetColorManager != null)
+                if (ImGui.Button("Spell List Debug") && TargetColorManager != null)
                 {
                     PluginLog.Debug("Spell List: ");
                     foreach (uint spells in TargetColorManager!.SpellList.Spells)
@@ -133,7 +135,13 @@ namespace CarnivaleHelper.Windows
                         PluginLog.Debug(physical.ToString());
                     }
                 }
-                ImGui.Separator();
+
+                //Target Debug
+                if (ImGui.Button("Target Debug"))
+                {
+                    PluginLog.Debug(Targets.currentDuty.ToString());
+                }
+                    ImGui.Separator();
             }
 #endif
             if (Targets != null)

@@ -8,7 +8,7 @@ using Dalamud.Interface.Windowing;
 using CarnivaleHelper.Windows;
 using CarnivaleHelper.Modules;
 using Dalamud.Logging;
-using FFXIVClientStructs;
+using FFXIVClientStructs.Interop;
 
 namespace CarnivaleHelper
 {
@@ -27,7 +27,8 @@ namespace CarnivaleHelper
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager)
         {
-            Resolver.Initialize();
+            Resolver.GetInstance.SetupSearchSpace();
+            Resolver.GetInstance.Resolve();
 
             PluginInterface = pluginInterface;
             CommandManager = commandManager;

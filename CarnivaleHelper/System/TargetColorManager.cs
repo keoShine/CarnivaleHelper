@@ -52,15 +52,15 @@ namespace CarnivaleHelper.System
 
                     //Spell Count Targets
                     case 3:
-                        if (SpellList.Spells.Count() >= 2 && SpellList.Spells.Count <= 4)
+                        if (SpellList.Spells.Count >= 2 && SpellList.Spells.Count <= 10)
                             return Colors.Green;
-                        if (SpellList.Spells.Count > 4)
+                        if (SpellList.Spells.Count > 10)
                             return Colors.Red;
                         return Colors.Orange;
                     case 4:
-                        if (SpellList.Spells.Count() >= 2 && SpellList.Spells.Count <= 10)
+                        if (SpellList.Spells.Count >= 2 && SpellList.Spells.Count <= 4)
                             return Colors.Green;
-                        if (SpellList.Spells.Count > 10)
+                        if (SpellList.Spells.Count > 4)
                             return Colors.Red;
                         return Colors.Orange;
 
@@ -82,11 +82,11 @@ namespace CarnivaleHelper.System
                     case 14:
                         return SetColor(Aspect.Lightning);
                     case 15:
-                        if (SpellList.ElementalAspect.Count() == 6)
+                        if (SpellList.ElementalAspect.Count == 6)
                             return Colors.Green;
                         return Colors.Orange;
                     case 16:
-                        if (SpellList.ElementalAspect.Count() == 6 && SpellList.DamageType.Intersect(new List<byte> { 1, 2, 3}).Count() == 3)
+                        if (SpellList.ElementalAspect.Count == 6 && SpellList.DamageType.Intersect(new List<byte> { 1, 2, 3}).Count() == 3)
                         {
                             return Colors.Green;
                         }
@@ -96,21 +96,21 @@ namespace CarnivaleHelper.System
                     case 19:
                         if (SpellList.DamageType.Contains(5))
                             return Colors.Red;
-                        if (SpellList.DamageType.Count() > 0)
+                        if (SpellList.DamageType.Any())
                             return Colors.Green;
                         return Colors.Orange;
 
                     //Spell Rank Targets
                     case 20:
-                        if (SpellList.Ranks.Intersect(new List<byte> { 1, 2, 3 }).Count() > 0)
+                        if (SpellList.Ranks.Intersect(new List<byte> { 1, 2, 3 }).Any())
                             return Colors.Red;
-                        if (SpellList.Ranks.Count != 0)
+                        if (SpellList.DamageType.Any())
                             return Colors.Green;
                         return Colors.Orange;
                     case 21:
-                        if (SpellList.Ranks.Intersect(new List<byte> { 3, 4, 5 }).Count() > 0)
+                        if (SpellList.Ranks.Intersect(new List<byte> { 3, 4, 5 }).Any())
                             return Colors.Red;
-                        if (SpellList.Ranks.Count != 0)
+                        if (SpellList.DamageType.Any())
                             return Colors.Green;
                         return Colors.Orange;
 
@@ -152,7 +152,7 @@ namespace CarnivaleHelper.System
         //Check for Elemental Damage targets
         private Vector4 SetColor(Aspect element)
         {
-            if (SpellList.ElementalAspect.Count() != 0)
+            if (SpellList.ElementalAspect.Count != 0)
             {
                 foreach (var aspect in SpellList.ElementalAspect)
                     if (aspect != (byte) element)

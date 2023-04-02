@@ -17,6 +17,7 @@ namespace CarnivaleHelper
         [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
         [PluginService] public static ChatGui Chat { get; private set; } = null!;
         [PluginService] public static ClientState ClientState { get; private set; } = null!;
+        [PluginService] public static ObjectTable Objects { get; private set; } = null!;
         [PluginService] public static CommandManager Commands { get; private set; } = null!;
         [PluginService] public static Condition Condition { get; private set; } = null!;
         [PluginService] public static DataManager DataManager { get; private set; } = null!;
