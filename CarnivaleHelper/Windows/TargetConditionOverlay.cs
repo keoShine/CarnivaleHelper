@@ -141,7 +141,34 @@ namespace CarnivaleHelper.Windows
                 {
                     PluginLog.Debug(Targets.currentDuty.ToString());
                 }
-                    ImGui.Separator();
+
+                if (ImGui.Button("Damage Debug"))
+                {
+                    if (TargetColorManager.damageBool)
+                    {
+                        PluginLog.Debug("Damage Taken");
+                    }
+                    else
+                    {
+                        PluginLog.Debug("No Damage Taken");
+                    }
+                }
+
+                if (ImGui.Button("Status Debug"))
+                {
+                    if (TargetColorManager.statusList.Any())
+                    {
+                        foreach (uint spells in TargetColorManager!.statusList)
+                        {
+                            PluginLog.Debug(TargetColorManager.statusList.ToString());
+                        }
+                    }
+                    else
+                    {
+                        PluginLog.Debug("No statuses in Status List");
+                    }
+                }
+                ImGui.Separator();
             }
 #endif
             if (Targets != null)
@@ -165,7 +192,7 @@ namespace CarnivaleHelper.Windows
                         (Targets?.targetList[0] == 1 || Targets?.targetList[0] == 2) &&
                         Service.ClientState.TerritoryType == 796)
                     {
-                        ImGui.TextColored(TargetColorManager!.timerColor,
+                        ImGui.TextColored(TargetColorManager.timerColor,
                             (TargetColorManager.timer / 60).ToString() + ":" + (TargetColorManager.timer % 60).ToString()!.PadLeft(2, '0'));
                     }
                 }

@@ -2,10 +2,14 @@ using CarnivaleHelper.Enums;
 using CarnivaleHelper.Modules;
 using CarnivaleHelper.Utilities;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using Dalamud.Logging;
+//using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using Lumina.Excel.GeneratedSheets;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +21,9 @@ namespace CarnivaleHelper.System
     {
         public SpellList SpellList;
         public Targets Targets;
+        public List<uint> statusList;
+        public bool damageBool;
+        public BattleChara player;
         public Vector4 timerColor;
         public int? timer;
 
@@ -24,11 +31,37 @@ namespace CarnivaleHelper.System
         {
             SpellList = new SpellList();
             Targets = targets;
+            statusList = new List<uint>();
+            damageBool = false;
+            timerColor = Colors.White;
+
+            Service.Framework.Update += OnFrameworkUpdate;
         }
 
         public void Dispose()
         {
             SpellList.Dispose();
+            statusList.Clear();
+            statusList.TrimExcess();
+            Service.Framework.Update -= OnFrameworkUpdate;
+        }
+
+        private void OnFrameworkUpdate(Dalamud.Game.Framework framework)
+        {
+            if (Service.Objects.Any())
+            {
+                player = Service.Objects.Where(x => x.ObjectKind == ObjectKind.Player).FirstOrDefault() as BattleChara ?? null;
+            }
+            
+            if (!damageBool && player is not null)
+            {
+                if (player.MaxHp - player.CurrentHp > 0)
+                {
+                    damageBool = true;
+                }
+            }
+            //Still working on this
+            //statusList = UpdateStatusList(statusList);
         }
 
         public Vector4 SetColor(byte targetId)
@@ -37,11 +70,10 @@ namespace CarnivaleHelper.System
             if (Service.ClientState.TerritoryType == 796)
             {
                 //Targets to still make tests for:
-                    //5: Can't Touch This
-                    //6: Ain't Got Time to Bleed
-                    //7: Modus Interruptus
-                    //17: Enfeeble Me Tender
-                    //18: Enfeeble Me Tenderer
+                    //6: Ain't Got Time to Bleed (Restore zero HP, not including Auto-Recover)
+                    //7: Modus Interruptus (At least one spell cast by an enemy did not finish)
+                    //17: Enfeeble Me Tender (Inflict 6+ unique debuff statuses on enemies)
+                    //18: Enfeeble Me Tenderer (Inflict 9+ unique debuff statuses on enemies)
                 switch (targetId)
                 {
                     //Timer-Based Targets
@@ -63,6 +95,12 @@ namespace CarnivaleHelper.System
                         if (SpellList.Spells.Count > 4)
                             return Colors.Red;
                         return Colors.Orange;
+                    
+                    //Take no damage
+                    case 5:
+                        if (damageBool)
+                            return Colors.Red;
+                        return Colors.Green;
 
                     //Sprint
                     case 8:
@@ -91,6 +129,16 @@ namespace CarnivaleHelper.System
                             return Colors.Green;
                         }
                         return Colors.Orange;
+                    
+                    //Enfeeblement Targets
+                    //case 17:
+                    //    if (statusList.Count >= 6)
+                    //        return Colors.Green;
+                    //    return Colors.Orange;
+                    //case 18:
+                    //    if (statusList.Count >= 9)
+                    //        return Colors.Green;
+                    //    return Colors.Orange;
 
                     //Physical Damage Only
                     case 19:
@@ -169,6 +217,25 @@ namespace CarnivaleHelper.System
                     !(Service.Condition[ConditionFlag.BetweenAreas51] ||
                         Service.Condition[ConditionFlag.OccupiedInQuestEvent] ||
                         Service.Condition[ConditionFlag.Occupied33]);
+        }
+
+        private List<uint> UpdateStatusList(List<uint> statusList)
+        {
+            List<BattleChara> enemyTable = Service.Objects.Where(x => x.ObjectKind == ObjectKind.BattleNpc) as List<BattleChara> ?? null;
+            if (enemyTable is not null && enemyTable.Any())
+            {
+                foreach (BattleChara obj in enemyTable!)
+                {
+                    foreach (Status status in obj.StatusList)
+                    {
+                        if (!statusList.Contains(status.StatusId) && Service.DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Status>()!.GetRow(status.StatusId)!.StatusCategory == 2)
+                        {
+                            statusList.Add(status.StatusId);
+                        }
+                    }
+                }
+            }
+            return statusList;
         }
     }
 }
